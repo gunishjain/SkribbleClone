@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.gunishjain.skribbleapp.ui.homescreen.HomeScreen
+import com.gunishjain.skribbleapp.ui.paintscreen.PaintScreen
 import com.gunishjain.skribbleapp.ui.rooms.CreateRoom
 import com.gunishjain.skribbleapp.ui.rooms.JoinRoom
 
@@ -31,6 +32,12 @@ fun SetupNavGraph(
             route = Screen.JoinRoom.route
         )  {
             JoinRoom()
+        }
+
+        composable(
+            route = Screen.PaintScreen.route
+        )  {
+            PaintScreen()
         }
 
 
