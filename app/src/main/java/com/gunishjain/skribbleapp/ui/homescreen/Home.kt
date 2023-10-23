@@ -7,13 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.gunishjain.skribbleapp.navigation.Screen
 
 
-@Preview
+
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navController: NavController
+) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -26,12 +29,18 @@ fun HomeScreen() {
         Row(modifier = Modifier.padding(5.dp),
             verticalAlignment = Alignment.CenterVertically) {
 
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                navController.navigate(
+                    route = Screen.CreateRoom.route)
+            }) {
                 Text(text = "Create Room")
             }
             Spacer(modifier = Modifier.width(13.dp))
 
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                navController.navigate(
+                    route=Screen.JoinRoom.route)
+            }) {
                 Text(text = "Join Room")
             }
 
