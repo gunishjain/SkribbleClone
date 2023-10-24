@@ -1,5 +1,6 @@
 package com.gunishjain.skribbleapp.socket
 
+import android.util.Log
 import com.gunishjain.skribbleapp.util.Constants.Companion.SERVER_URL
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -26,5 +27,20 @@ class SocketManager {
 
     fun isConnected(): Boolean {
         return socket?.connected() ?: false
+    }
+
+    fun onMessageReceived(listener: (String) -> Unit) {
+        socket?.on("broadcast") { args ->
+            args.let {msg->
+                if(msg.isNotEmpty()){
+                    val message = args[0] as String
+                    listener.invoke(message)
+                }
+            }
+        }
+    }
+
+    fun sendMessage(message: String) {
+        socket?.emit("message", message)
     }
 }

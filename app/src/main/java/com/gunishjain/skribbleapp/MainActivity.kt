@@ -14,7 +14,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.gunishjain.skribbleapp.ui.theme.SkribbleAppTheme
 import com.gunishjain.skribbleapp.navigation.SetupNavGraph
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
     lateinit var navController: NavHostController
