@@ -1,9 +1,15 @@
 package com.gunishjain.skribbleapp.socket
 
 import android.util.Log
+import com.google.gson.JsonObject
+import com.gunishjain.skribbleapp.data.model.Room
+import com.gunishjain.skribbleapp.data.model.fromJson
+import com.gunishjain.skribbleapp.data.model.toJson
 import com.gunishjain.skribbleapp.util.Constants.Companion.SERVER_URL
 import io.socket.client.IO
 import io.socket.client.Socket
+import org.json.JSONException
+import org.json.JSONObject
 import java.net.URISyntaxException
 
 class SocketManager {
@@ -42,5 +48,27 @@ class SocketManager {
 
     fun sendMessage(message: String) {
         socket?.emit("message", message)
+    }
+
+    fun sendRoomData(room: String) {
+        socket?.emit("create-game", room)
+    }
+
+    fun updatedRoomDetails(listener: (Room) -> Unit){
+        socket?.on("updateRoom") { args ->
+            args.let {msg->
+                if(msg.isNotEmpty()){
+                    try {
+                        val jsonObject = msg[0] as JSONObject
+                        val jsonString = jsonObject.toString()
+                        val room = jsonString.fromJson(Room::class.java)
+                        listener.invoke(room)
+                    } catch (e: JSONException) {
+                        // Handle JSON parsing error
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
     }
 }

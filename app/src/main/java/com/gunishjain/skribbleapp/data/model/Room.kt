@@ -5,11 +5,10 @@ import com.google.gson.Gson
 
 data class Room(
     val roomName: String,
-    val roomLeader: String,
+    val nickname: String,
     val maxRounds: Int,
     val roomSize: Int
 ){
-    override fun toString(): String = Uri.encode(Gson().toJson(this))
 }
 
 

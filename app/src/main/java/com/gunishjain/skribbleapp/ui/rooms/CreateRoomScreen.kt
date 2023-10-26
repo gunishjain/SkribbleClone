@@ -1,5 +1,7 @@
 package com.gunishjain.skribbleapp.ui.rooms
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -75,9 +77,16 @@ fun CreateRoom(
         Spacer(modifier = Modifier.height(5.dp))
 
         Button(onClick = {
-            val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
-            val model = room.toJson()
-            navController.navigate(route = "paint_screen/item/$model")
+
+            if(roomFieldState.isNotEmpty() and userFieldState.isNotEmpty()){
+                val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
+                val model = room.toJson()
+                navController.navigate(route = "paint_screen/item/$model")
+            }
+            else {
+                Log.d("Gunish","Fill all values")
+            }
+
         }) {
             Text(text = "Create Room")
         }

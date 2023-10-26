@@ -46,7 +46,7 @@ fun SetupNavGraph(
         )  {
                 it.arguments?.getString("room")?.let {jsonString->
                     val room = jsonString.fromJson(Room::class.java)
-                    PaintLayout(room=room)
+                    PaintLayout(room=room, navController = navController)
                 }
         }
 
