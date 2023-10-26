@@ -1,5 +1,6 @@
 package com.gunishjain.skribbleapp.ui.paintscreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,12 +13,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.gunishjain.skribbleapp.data.model.Room
 
 @Composable
-fun PaintLayout() {
+fun PaintLayout(
+    room: Room
+) {
     val paintViewModel : PaintScreenViewModel = hiltViewModel()
     paintViewModel.connectToServer()
     PaintScreen(paintViewModel)
+    Log.d("Args",room.roomLeader)
 }
 @Composable
 fun PaintScreen(

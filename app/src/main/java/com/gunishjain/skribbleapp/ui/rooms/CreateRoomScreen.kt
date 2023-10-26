@@ -8,14 +8,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.gunishjain.skribbleapp.data.model.Room
+import com.gunishjain.skribbleapp.data.model.toJson
 
 
-@Preview
 @Composable
-fun CreateRoom() {
+fun CreateRoom(
+    navController: NavController
+) {
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -24,6 +27,10 @@ fun CreateRoom() {
     var userFieldState by remember {
         mutableStateOf("")
     }
+
+    var maxRounds by remember { mutableStateOf(2) } // Default value
+    var roomSize by remember { mutableStateOf(2) }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(text = "Create Room",
@@ -36,7 +43,7 @@ fun CreateRoom() {
             label = { Text(text = "Enter Room Name") },
             onValueChange = { roomFieldState=it },
             singleLine = true,
-             modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -49,11 +56,29 @@ fun CreateRoom() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        ExposedDropdownMenuBox(labelText = "Select Max Rounds", contentArray = arrayListOf("2","3","4","5"))
+        ExposedDropdownMenuBox(
+            labelText = "Select Max Rounds",
+            contentArray = arrayListOf(2,3,4,5),
+            selectedData = maxRounds,
+            onItemSelected = {maxRounds = it}
+        )
+
         Spacer(modifier = Modifier.height(5.dp))
-        ExposedDropdownMenuBox(labelText = "Select Room Size", contentArray = arrayListOf("2","3","4","5"))
+
+        ExposedDropdownMenuBox(
+            labelText = "Select Room Size",
+            contentArray = arrayListOf(2,3,4,5),
+            selectedData = roomSize,
+            onItemSelected = {roomSize = it}
+        )
+
         Spacer(modifier = Modifier.height(5.dp))
-        Button(onClick = { /*TODO*/ }) {
+
+        Button(onClick = {
+            val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
+            val model = room.toJson()
+            navController.navigate(route = "paint_screen/item/$model")
+        }) {
             Text(text = "Create Room")
         }
     }
@@ -63,11 +88,14 @@ fun CreateRoom() {
 @Composable
 fun ExposedDropdownMenuBox(
     labelText :String,
-    contentArray : ArrayList<String>
+    contentArray : ArrayList<Int>,
+    selectedData: Int,
+    onItemSelected :(Int)->Unit
+
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(labelText) }
+//    var selectedText by remember { mutableStateOf(labelText) }
 
     Box(
         modifier = Modifier
@@ -81,7 +109,7 @@ fun ExposedDropdownMenuBox(
             }
         ) {
             TextField(
-                value = selectedText,
+                value = selectedData.toString(),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
@@ -94,9 +122,9 @@ fun ExposedDropdownMenuBox(
             ) {
                 contentArray.forEach { item ->
                     DropdownMenuItem(
-                        content = { Text(text = item) },
+                        content = { Text(text = item.toString()) },
                         onClick = {
-                            selectedText = item
+                            onItemSelected(item)
                             expanded = false
                         }
                     )
