@@ -1,5 +1,6 @@
 package com.gunishjain.skribbleapp.ui.paintscreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +18,9 @@ import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
 
 @Composable
-fun PaintLayout(
+fun <T>PaintLayout(
     navController: NavController,
-    room: Room
+    room: T
 ) {
     val previousDestination: String? = navController.previousBackStackEntry?.destination?.route
     val cameFromCreateRoom = previousDestination == "create_room"
@@ -27,13 +28,12 @@ fun PaintLayout(
     paintViewModel.connectToServer()
     if(cameFromCreateRoom){
         room.toJson()?.let { paintViewModel.sendRoomDetail(it) }
+    } else {
+        room.toJson()?.let {
+            paintViewModel.sendJoinRoomDetail(it)
+        }
     }
-    paintViewModel.updateRoom()
-    val roomInfo by paintViewModel.roomInfo.collectAsState()
-    Text(text =roomInfo.roomName )
 
-//    PaintScreen(paintViewModel)
-//    Log.d("Args",room.roomLeader)
 }
 @Composable
 fun PaintScreen(

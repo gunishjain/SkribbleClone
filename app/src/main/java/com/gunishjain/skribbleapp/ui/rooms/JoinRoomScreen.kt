@@ -1,6 +1,7 @@
 package com.gunishjain.skribbleapp.ui.rooms
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -11,11 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.gunishjain.skribbleapp.data.model.JoinRoom
+import com.gunishjain.skribbleapp.data.model.Room
+import com.gunishjain.skribbleapp.data.model.toJson
 
 
 @Preview
 @Composable
-fun JoinRoom() {
+fun JoinRoom(
+    navController: NavController
+) {
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -49,7 +56,15 @@ fun JoinRoom() {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = {
+            if(userFieldState.isNotEmpty() and roomFieldState.isNotEmpty()){
+                val joinroom = JoinRoom(roomFieldState, userFieldState)
+                val model = joinroom.toJson()
+                navController.navigate(route = "paint_screen?join=$model")
+            } else {
+                Log.d("Gunish","Enter the details")
+            }
+        }) {
             Text(text = "Join Room")
         }
     }

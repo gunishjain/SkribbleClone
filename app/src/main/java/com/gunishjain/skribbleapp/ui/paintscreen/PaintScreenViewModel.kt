@@ -29,7 +29,6 @@ class PaintScreenViewModel @Inject constructor(private val socketManager: Socket
 
     fun receiveMessage(){
         socketManager.onMessageReceived {
-            Log.d("Gunish-vm",it)
             _uiState.value=it
         }
     }
@@ -43,9 +42,12 @@ class PaintScreenViewModel @Inject constructor(private val socketManager: Socket
         socketManager.sendRoomData(room)
     }
 
+    fun sendJoinRoomDetail(joinroom: String){
+        socketManager.sendJoinRoomData(joinroom)
+    }
+
     fun updateRoom(){
         socketManager.updatedRoomDetails {
-            Log.d("RoomData-vm",it.toString())
             _roomInfo.value=it
         }
     }
@@ -53,6 +55,5 @@ class PaintScreenViewModel @Inject constructor(private val socketManager: Socket
     fun isConnected(): Boolean {
         return socketManager.isConnected()
     }
-
 
 }

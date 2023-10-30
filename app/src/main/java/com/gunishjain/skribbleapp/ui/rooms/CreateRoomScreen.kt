@@ -81,7 +81,7 @@ fun CreateRoom(
             if(roomFieldState.isNotEmpty() and userFieldState.isNotEmpty()){
                 val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
                 val model = room.toJson()
-                navController.navigate(route = "paint_screen/item/$model")
+                navController.navigate(route = "paint_screen?room=$model")
             }
             else {
                 Log.d("Gunish","Fill all values")

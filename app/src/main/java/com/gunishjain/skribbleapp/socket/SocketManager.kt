@@ -54,6 +54,10 @@ class SocketManager {
         socket?.emit("create-game", room)
     }
 
+    fun sendJoinRoomData(joinroom: String){
+        socket?.emit("join-game", joinroom)
+    }
+
     fun updatedRoomDetails(listener: (Room) -> Unit){
         socket?.on("updateRoom") { args ->
             args.let {msg->
@@ -64,7 +68,6 @@ class SocketManager {
                         val room = jsonString.fromJson(Room::class.java)
                         listener.invoke(room)
                     } catch (e: JSONException) {
-                        // Handle JSON parsing error
                         e.printStackTrace()
                     }
                 }
