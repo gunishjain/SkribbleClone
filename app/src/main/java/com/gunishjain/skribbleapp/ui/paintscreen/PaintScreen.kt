@@ -1,6 +1,5 @@
 package com.gunishjain.skribbleapp.ui.paintscreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
 
 @Composable
@@ -25,14 +23,29 @@ fun <T>PaintLayout(
     val previousDestination: String? = navController.previousBackStackEntry?.destination?.route
     val cameFromCreateRoom = previousDestination == "create_room"
     val paintViewModel : PaintScreenViewModel = hiltViewModel()
-    paintViewModel.connectToServer()
+
+    LaunchedEffect(Unit) {
+        paintViewModel.connectToServer()
+    }
+
+
     if(cameFromCreateRoom){
-        room.toJson()?.let { paintViewModel.sendRoomDetail(it) }
+        room.toJson()?.let { paintViewModel.sendRoomDetail(it)
+            LaunchedEffect(Unit){
+                paintViewModel.updateRoom()
+            }
+            Painter(paintViewModel)
+        }
     } else {
         room.toJson()?.let {
-            paintViewModel.sendJoinRoomDetail(it)
+            LaunchedEffect(Unit){
+                paintViewModel.sendJoinRoomDetail(it)
+                paintViewModel.updateRoom()
+            }
+            PaintViewer(viewModel =paintViewModel )
         }
     }
+    
 
 }
 @Composable
@@ -66,7 +79,3 @@ fun PaintScreen(
 
 }
 
-@Composable
-fun ChatScreen() {
-
-}
