@@ -1,5 +1,6 @@
 package com.gunishjain.skribbleapp.ui.paintscreen
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import android.view.MotionEvent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
-import com.gunishjain.skribbleapp.data.model.toJson
 import com.gunishjain.skribbleapp.util.PaintData
 import com.gunishjain.skribbleapp.util.PathState
 import com.gunishjain.skribbleapp.util.Point
@@ -37,6 +37,7 @@ paintScreenVM: PaintScreenViewModel
 
     val room =paintScreenVM.roomInfo.collectAsState()
     val roomName = room.value.roomName
+    Log.d("Painter-composable",room.toString())
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -53,7 +54,7 @@ paintScreenVM: PaintScreenViewModel
             usedColor,
             path.value,
             sendDrawingDataToBackend = {
-                paintScreenVM.sendPaintDetail(PaintData(it,drawColor.value.toArgb(),drawBrush.value,roomName))
+                paintScreenVM.sendPaintDetail(PaintData(it,drawColor.value.toArgb(),drawBrush.value,roomName!!))
             }
         )
 

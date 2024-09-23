@@ -1,5 +1,6 @@
 package com.gunishjain.skribbleapp.ui.paintscreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,53 +30,30 @@ fun <T>PaintLayout(
     }
 
 
-    if(cameFromCreateRoom){
-        room.toJson()?.let { paintViewModel.sendRoomDetail(it)
-            LaunchedEffect(Unit){
-                paintViewModel.updateRoom()
+    LaunchedEffect(room) {
+        room.toJson()?.let { roomJson ->
+            if (cameFromCreateRoom) {
+                paintViewModel.sendCreateRoomDetail(roomJson)
+            } else {
+                paintViewModel.sendJoinRoomDetail(roomJson)
             }
-            Painter(paintViewModel)
+            paintViewModel.updateRoom()
         }
+    }
+
+    val roomInfo by paintViewModel.roomInfo.collectAsState()
+
+    if (cameFromCreateRoom) {
+        Painter(paintViewModel)
     } else {
-        room.toJson()?.let {
-            LaunchedEffect(Unit){
-                paintViewModel.sendJoinRoomDetail(it)
-                paintViewModel.updateRoom()
-            }
-            PaintViewer(viewModel =paintViewModel )
-        }
+        PaintViewer(viewModel = paintViewModel)
     }
-    
 
-}
-@Composable
-fun PaintScreen(
-    paintVM: PaintScreenViewModel
-) {
-    var userFieldState by remember {
-        mutableStateOf("")
-    }
-    val uiState by paintVM.uiState.collectAsState()
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(
-            value = userFieldState,
-            label = { Text(text = "Enter Your Name") },
-            onValueChange = {
-                userFieldState=it },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {
-            paintVM.sendMessage(userFieldState)
-            paintVM.receiveMessage()
-        }) {
-            Text(text = "Click Me")
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(text = uiState)
+    LaunchedEffect(roomInfo) {
+        Log.d("PaintLayout", "Current room info: $roomInfo")
     }
 
 }
+
 

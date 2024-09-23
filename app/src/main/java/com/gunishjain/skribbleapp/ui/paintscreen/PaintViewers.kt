@@ -23,7 +23,7 @@ import com.gunishjain.skribbleapp.util.PathState
 fun PaintViewer(
     viewModel: PaintScreenViewModel
 ) {
-    Log.d("JoinCheck","here")
+    Log.d("JoinCheck-PaintViewer","here")
     val path = remember { mutableStateOf(mutableListOf<PathState>()) }
     Paint(path,viewModel)
     LaunchedEffect(Unit) {

@@ -12,15 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
+import com.gunishjain.skribbleapp.ui.paintscreen.PaintScreenViewModel
+import com.gunishjain.skribbleapp.ui.viewmodels.CreateAndJoinViewModel
 
 
 @Composable
 fun CreateRoom(
     navController: NavController
 ) {
+
+    val createAndJoinViewModel : CreateAndJoinViewModel = hiltViewModel()
+    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -32,6 +38,11 @@ fun CreateRoom(
 
     var maxRounds by remember { mutableStateOf(2) } // Default value
     var roomSize by remember { mutableStateOf(2) }
+
+    LaunchedEffect(Unit) {
+        createAndJoinViewModel.connectToServer()
+    }
+
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -81,14 +92,29 @@ fun CreateRoom(
             if(roomFieldState.isNotEmpty() and userFieldState.isNotEmpty()){
                 val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
                 val model = room.toJson()
-                navController.navigate(route = "paint_screen?room=$model")
+
+                createAndJoinViewModel.sendCreateRoomDetail(model!!)
+                createAndJoinViewModel.listenForErrors()
             }
             else {
-                Log.d("Gunish","Fill all values")
+                Log.d("CreateRoom Screen","Fill all values")
             }
 
         }) {
             Text(text = "Create Room")
+        }
+    }
+
+
+    LaunchedEffect(roomStatus) {
+        if (roomStatus != "NULL") {
+            if (roomStatus.contains("Please enter a valid room name")) {
+                Log.d("CreateRoom Screen", "Error Creating ROOM: $roomStatus")
+            } else {
+                Log.d("CreateRoom Screen", "navigate: $roomStatus")
+
+                //TODO: handle navigation
+            }
         }
     }
 }

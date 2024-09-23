@@ -12,17 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.gunishjain.skribbleapp.data.model.JoinRoom
 import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
+import com.gunishjain.skribbleapp.ui.viewmodels.CreateAndJoinViewModel
 
 
-@Preview
 @Composable
 fun JoinRoom(
     navController: NavController
 ) {
+
+    val createAndJoinViewModel : CreateAndJoinViewModel = hiltViewModel()
+    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -31,6 +35,11 @@ fun JoinRoom(
     var userFieldState by remember {
         mutableStateOf("")
     }
+
+    LaunchedEffect(Unit) {
+        createAndJoinViewModel.connectToServer()
+    }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(text = "Join Room",
@@ -60,12 +69,26 @@ fun JoinRoom(
             if(userFieldState.isNotEmpty() and roomFieldState.isNotEmpty()){
                 val joinroom = JoinRoom(roomFieldState, userFieldState)
                 val model = joinroom.toJson()
-                navController.navigate(route = "paint_screen?join=$model")
+                createAndJoinViewModel.sendJoinRoomDetail(model!!)
+                createAndJoinViewModel.listenForErrors()
+
             } else {
-                Log.d("Gunish","Enter the details")
+                Log.d("JoinRoom Screen","Enter the all Details")
             }
         }) {
             Text(text = "Join Room")
+        }
+    }
+
+    LaunchedEffect(roomStatus) {
+        if (roomStatus != "NULL") {
+            if (roomStatus.contains("Please enter a valid room name")) {
+                Log.d("JoinRoom Screen", "Error Creating ROOM: $roomStatus")
+            } else {
+                Log.d("JoinRoom Screen", "navigate: $roomStatus")
+
+                //TODO: handle navigation
+            }
         }
     }
 }
