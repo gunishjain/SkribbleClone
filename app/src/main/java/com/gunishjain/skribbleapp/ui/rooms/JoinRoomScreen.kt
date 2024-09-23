@@ -9,15 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.gunishjain.skribbleapp.data.model.JoinRoom
-import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
-import com.gunishjain.skribbleapp.ui.viewmodels.CreateAndJoinViewModel
+import com.gunishjain.skribbleapp.ui.viewmodels.LobbyViewModel
 
 
 @Composable
@@ -25,8 +23,8 @@ fun JoinRoom(
     navController: NavController
 ) {
 
-    val createAndJoinViewModel : CreateAndJoinViewModel = hiltViewModel()
-    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
+    val viewModel : LobbyViewModel = hiltViewModel()
+//    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -36,9 +34,9 @@ fun JoinRoom(
         mutableStateOf("")
     }
 
-    LaunchedEffect(Unit) {
-        createAndJoinViewModel.connectToServer()
-    }
+//    LaunchedEffect(Unit) {
+//        createAndJoinViewModel.connectToServer()
+//    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -67,10 +65,11 @@ fun JoinRoom(
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = {
             if(userFieldState.isNotEmpty() and roomFieldState.isNotEmpty()){
-                val joinroom = JoinRoom(roomFieldState, userFieldState)
-                val model = joinroom.toJson()
-                createAndJoinViewModel.sendJoinRoomDetail(model!!)
-                createAndJoinViewModel.listenForErrors()
+//                val joinroom = JoinRoom(roomFieldState, userFieldState)
+//                val model = joinroom.toJson()
+//                createAndJoinViewModel.sendJoinRoomDetail(model!!)
+//                createAndJoinViewModel.listenForErrors()
+                viewModel.joinRoom(roomFieldState,userFieldState)
 
             } else {
                 Log.d("JoinRoom Screen","Enter the all Details")
@@ -80,16 +79,6 @@ fun JoinRoom(
         }
     }
 
-    LaunchedEffect(roomStatus) {
-        if (roomStatus != "NULL") {
-            if (roomStatus.contains("Please enter a valid room name")) {
-                Log.d("JoinRoom Screen", "Error Creating ROOM: $roomStatus")
-            } else {
-                Log.d("JoinRoom Screen", "navigate: $roomStatus")
 
-                //TODO: handle navigation
-            }
-        }
-    }
 }
 

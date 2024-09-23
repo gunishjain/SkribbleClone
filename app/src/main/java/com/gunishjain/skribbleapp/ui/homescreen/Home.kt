@@ -14,7 +14,7 @@ import com.gunishjain.skribbleapp.navigation.Screen
 
 
 @Composable
-fun HomeScreen(
+fun MainMenuScreen(
     navController: NavController
 ) {
 

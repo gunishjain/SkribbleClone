@@ -1,7 +1,6 @@
 package com.gunishjain.skribbleapp.ui.rooms
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -16,17 +15,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
-import com.gunishjain.skribbleapp.ui.paintscreen.PaintScreenViewModel
-import com.gunishjain.skribbleapp.ui.viewmodels.CreateAndJoinViewModel
+import com.gunishjain.skribbleapp.ui.viewmodels.LobbyViewModel
 
 
 @Composable
-fun CreateRoom(
+fun CreateRoomScreen(
     navController: NavController
 ) {
 
-    val createAndJoinViewModel : CreateAndJoinViewModel = hiltViewModel()
-    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
+    val viewModel: LobbyViewModel = hiltViewModel()
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -38,10 +35,6 @@ fun CreateRoom(
 
     var maxRounds by remember { mutableStateOf(2) } // Default value
     var roomSize by remember { mutableStateOf(2) }
-
-    LaunchedEffect(Unit) {
-        createAndJoinViewModel.connectToServer()
-    }
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -89,16 +82,7 @@ fun CreateRoom(
 
         Button(onClick = {
 
-            if(roomFieldState.isNotEmpty() and userFieldState.isNotEmpty()){
-                val room = Room(roomFieldState, userFieldState, maxRounds, roomSize)
-                val model = room.toJson()
-
-                createAndJoinViewModel.sendCreateRoomDetail(model!!)
-                createAndJoinViewModel.listenForErrors()
-            }
-            else {
-                Log.d("CreateRoom Screen","Fill all values")
-            }
+            viewModel.createRoom(roomFieldState, userFieldState,  roomSize , maxRounds)
 
         }) {
             Text(text = "Create Room")
@@ -106,17 +90,6 @@ fun CreateRoom(
     }
 
 
-    LaunchedEffect(roomStatus) {
-        if (roomStatus != "NULL") {
-            if (roomStatus.contains("Please enter a valid room name")) {
-                Log.d("CreateRoom Screen", "Error Creating ROOM: $roomStatus")
-            } else {
-                Log.d("CreateRoom Screen", "navigate: $roomStatus")
-
-                //TODO: handle navigation
-            }
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)

@@ -1,15 +1,14 @@
 package com.gunishjain.skribbleapp.data.model
 
-import android.net.Uri
-import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+
 
 data class Room(
-    val roomName: String,
-    val nickname: String,
-    val maxRounds: Int,
-    val roomSize: Int
-){
-}
-
+    @SerializedName("_id") val id: String,
+    val name: String,
+    val players: List<Player> = emptyList(),
+    val maxPlayers: Int,
+    val maxRounds: Int
+)
 
 

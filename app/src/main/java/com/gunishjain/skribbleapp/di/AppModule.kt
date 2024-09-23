@@ -17,6 +17,4 @@ object AppModule {
         return SocketManager()
     }
 
-
-
 }
