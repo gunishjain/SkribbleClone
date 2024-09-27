@@ -14,7 +14,6 @@ class BaseClass : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Now you can use the injected socketManager
         socketManager.connect()
     }
 

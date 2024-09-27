@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.gunishjain.skribbleapp.data.model.Room
 import com.gunishjain.skribbleapp.data.model.toJson
+import com.gunishjain.skribbleapp.navigation.Screen
+import com.gunishjain.skribbleapp.ui.viewmodels.CreateRoomViewModel
 import com.gunishjain.skribbleapp.ui.viewmodels.LobbyViewModel
 
 
@@ -23,7 +25,9 @@ fun CreateRoomScreen(
     navController: NavController
 ) {
 
-    val viewModel: LobbyViewModel = hiltViewModel()
+    val viewModel: CreateRoomViewModel = hiltViewModel()
+    val roomCreated by viewModel.roomCreated.collectAsState(initial = null)
+
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -35,6 +39,12 @@ fun CreateRoomScreen(
 
     var maxRounds by remember { mutableStateOf(2) } // Default value
     var roomSize by remember { mutableStateOf(2) }
+
+    LaunchedEffect(roomCreated) {
+        roomCreated?.let {room->
+            navController.navigate(Screen.Lobby.passRoomName(room.name)) // Navigate to lobby when room is created
+        }
+    }
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

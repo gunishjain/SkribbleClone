@@ -13,9 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.gunishjain.skribbleapp.data.model.JoinRoom
-import com.gunishjain.skribbleapp.data.model.toJson
-import com.gunishjain.skribbleapp.ui.viewmodels.LobbyViewModel
+import com.gunishjain.skribbleapp.navigation.Screen
+import com.gunishjain.skribbleapp.ui.viewmodels.JoinRoomViewModel
 
 
 @Composable
@@ -23,8 +22,8 @@ fun JoinRoom(
     navController: NavController
 ) {
 
-    val viewModel : LobbyViewModel = hiltViewModel()
-//    val roomStatus by createAndJoinViewModel.uiState.collectAsState()
+    val viewModel : JoinRoomViewModel = hiltViewModel()
+    val roomJoined by viewModel.roomJoined.collectAsState(initial = null)
 
     var roomFieldState by remember {
         mutableStateOf("")
@@ -34,9 +33,12 @@ fun JoinRoom(
         mutableStateOf("")
     }
 
-//    LaunchedEffect(Unit) {
-//        createAndJoinViewModel.connectToServer()
-//    }
+    LaunchedEffect(roomJoined) {
+        roomJoined?.let {
+            Log.d("JoinRoom Screen: ",it.toString())
+            navController.navigate(Screen.Lobby.passRoomName(it.name)) // Navigate to lobby when room is joined
+        }
+    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -65,10 +67,7 @@ fun JoinRoom(
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = {
             if(userFieldState.isNotEmpty() and roomFieldState.isNotEmpty()){
-//                val joinroom = JoinRoom(roomFieldState, userFieldState)
-//                val model = joinroom.toJson()
-//                createAndJoinViewModel.sendJoinRoomDetail(model!!)
-//                createAndJoinViewModel.listenForErrors()
+
                 viewModel.joinRoom(roomFieldState,userFieldState)
 
             } else {
