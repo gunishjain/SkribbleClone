@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,6 +80,18 @@ fun LobbyScreen(
                     }
                 }
 
+                val previousCount = viewModel.previousPlayerCount
+                val currentCount = roomInfo.data?.players?.size
+
+                if (previousCount != null && currentCount != null && previousCount > currentCount) {
+                    Text(
+                        text = "A player has disconnected.",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
+
                 if (currentPlayerId == roomInfo.data?.players?.firstOrNull()?.id) {
                     Button(
                         onClick = { Log.d("LobbyScreen", "Start") },
@@ -89,6 +102,7 @@ fun LobbyScreen(
                         Text("Start Game")
                     }
                 }
+
             }
 
 

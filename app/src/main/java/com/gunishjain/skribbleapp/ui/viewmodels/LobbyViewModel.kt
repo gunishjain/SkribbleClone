@@ -28,6 +28,8 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
     private val _roomState = MutableStateFlow<UiState<Room?>>(UiState.Loading)
     val roomState: StateFlow<UiState<Room?>> = _roomState
 
+     var previousPlayerCount: Int? = 0
+
     private val _currentPlayerId = MutableStateFlow<String?>(null)
     val currentPlayerId: StateFlow<String?> = _currentPlayerId.asStateFlow()
 
@@ -41,6 +43,14 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
                 val roomName = args[0] as String
                 Log.d(TAG,"init $roomName")
                 fetchRoomDetails(roomName)
+            }
+        }
+
+        socketManager.on("playerDisconnected") { args ->
+            if (args.isNotEmpty()) {
+                val roomName = args[0] as String
+                Log.d(TAG,"disconnect $roomName")
+                fetchRoomDetails(roomName) // Assuming args[0] is roomName
             }
         }
 
@@ -88,7 +98,13 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
         val gson = Gson()
         val updatedRoom: Room = gson.fromJson(roomInfo.toString(), Room::class.java)
         Log.d(TAG, "Room Details: $updatedRoom")
-        _roomState.value = UiState.Success(updatedRoom)
+            val newPlayerCount = updatedRoom.players.size ?: 0
+
+            if (previousPlayerCount == null) {
+                previousPlayerCount = newPlayerCount
+            }
+
+            _roomState.value = UiState.Success(updatedRoom)
         Log.d(TAG, "_room StateFlow Value: ${_roomState.value}")
         GameManager.initializeLobby(updatedRoom)
         }
