@@ -1,6 +1,7 @@
 package com.gunishjain.skribbleapp.ui
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,8 +42,8 @@ fun LobbyScreen(
     val viewModel : LobbyViewModel = hiltViewModel()
     val roomState = viewModel.roomState.collectAsStateWithLifecycle()
     val roomInfo = roomState.value
+    val isPartyLeader = viewModel.isPartyLeader.collectAsStateWithLifecycle().value
 
-    val currentPlayerId by viewModel.currentPlayerId.collectAsState()
 
     LaunchedEffect(roomName) {
         viewModel.fetchRoomDetails(roomName!!)
@@ -80,31 +82,13 @@ fun LobbyScreen(
                     }
                 }
 
-                val previousCount = viewModel.previousPlayerCount
-                val currentCount = roomInfo.data?.players?.size
-
-                if (previousCount != null && currentCount != null && previousCount > currentCount) {
-                    Text(
-                        text = "A player has disconnected.",
-                        color = Color.Red,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-                }
-
-                if (currentPlayerId == roomInfo.data?.players?.firstOrNull()?.id) {
-                    Button(
-                        onClick = { Log.d("LobbyScreen", "Start") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    ) {
+                if (isPartyLeader) {
+                    Button(onClick = { /* Start game action */ }) {
                         Text("Start Game")
                     }
                 }
 
             }
-
 
             is UiState.Loading -> {
                 CircularProgressIndicator(
@@ -142,6 +126,16 @@ fun PlayerItem(player: Player, isRoomCreator: Boolean) {
                 color = MaterialTheme.colors.secondary
             )
         }
+    }
+}
+
+@Composable
+fun ShowToastMessage(message: String) {
+    val context = LocalContext.current
+
+    // Call this function wherever you want to show the toast
+    LaunchedEffect(message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }
 

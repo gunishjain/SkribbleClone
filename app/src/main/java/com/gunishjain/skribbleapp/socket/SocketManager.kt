@@ -47,5 +47,9 @@ class SocketManager {
         }
     }
 
+    fun getSocketId(): String? {
+        return socket?.id()
+    }
+
 
 }

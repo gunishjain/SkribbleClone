@@ -28,10 +28,8 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
     private val _roomState = MutableStateFlow<UiState<Room?>>(UiState.Loading)
     val roomState: StateFlow<UiState<Room?>> = _roomState
 
-     var previousPlayerCount: Int? = 0
-
-    private val _currentPlayerId = MutableStateFlow<String?>(null)
-    val currentPlayerId: StateFlow<String?> = _currentPlayerId.asStateFlow()
+    private val _isPartyLeader = MutableStateFlow<Boolean>(false)
+    val isPartyLeader: StateFlow<Boolean> = _isPartyLeader
 
     init {
         listenForPlayerUpdates()
@@ -75,14 +73,6 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
         // Emit request for the room details
         socketManager.emit("getRoomDetails", roomData)
 
-        // Listen for the server's response to 'getRoomDetails'
-//        socketManager.on("roomDetails") { args ->
-//            if (args.isNotEmpty()) {
-//                val roomInfo = args[0] as JSONObject
-//                handleRoomUpdate(roomInfo)
-//            }
-//        }
-
         // Handle potential errors like room not found
         socketManager.on("roomError") { args ->
             if (args.isNotEmpty()) {
@@ -98,13 +88,12 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
         val gson = Gson()
         val updatedRoom: Room = gson.fromJson(roomInfo.toString(), Room::class.java)
         Log.d(TAG, "Room Details: $updatedRoom")
-            val newPlayerCount = updatedRoom.players.size ?: 0
-
-            if (previousPlayerCount == null) {
-                previousPlayerCount = newPlayerCount
-            }
 
             _roomState.value = UiState.Success(updatedRoom)
+
+            val currentUser = updatedRoom?.players?.find { it.id == socketManager.getSocketId() }
+            _isPartyLeader.value = currentUser?.isPartyLeader ?: false
+
         Log.d(TAG, "_room StateFlow Value: ${_roomState.value}")
         GameManager.initializeLobby(updatedRoom)
         }
