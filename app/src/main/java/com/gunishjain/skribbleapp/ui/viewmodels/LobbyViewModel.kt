@@ -39,7 +39,7 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
         socketManager.on("playerJoined") { args ->
             if (args.isNotEmpty()) {
                 val roomName = args[0] as String
-                Log.d(TAG,"init $roomName")
+                Log.d(TAG,"Player Joined in: $roomName")
                 fetchRoomDetails(roomName)
             }
         }
@@ -48,23 +48,40 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
             if (args.isNotEmpty()) {
                 val roomName = args[0] as String
                 Log.d(TAG,"disconnect $roomName")
-                fetchRoomDetails(roomName) // Assuming args[0] is roomName
+                fetchRoomDetails(roomName)
             }
         }
 
-        // Listen for updates to the room's state, e.g., new players joining
         socketManager.on("roomDetails") { args ->
-            Log.d(TAG,"second function inside listen $args")
+
             if (args.isNotEmpty()) {
                 val roomInfo = args[0] as JSONObject
+                Log.d(TAG,"Room Details: $roomInfo")
                 handleRoomUpdate(roomInfo)
             }
         }
+
+        socketManager.on("gameStarted") { args ->
+            if (args.isNotEmpty()) {
+                val gameState = args[0] as JSONObject
+                Log.d("Game Started Data",gameState.toString())
+                GameManager.startGame()
+            }
+        }
+
+        socketManager.on("wordSelection") { args ->
+            if (args.isNotEmpty()) {
+                val words = args[0] as String
+                // Handle word selection phase
+            }
+        }
+
+
     }
 
 
     fun fetchRoomDetails(roomName: String) {
-        _roomState.value = UiState.Loading  // Indicate loading state when fetching room details
+        _roomState.value = UiState.Loading
 
         val roomData = JSONObject().apply {
             put("roomName", roomName)
@@ -87,11 +104,11 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
         viewModelScope.launch {
         val gson = Gson()
         val updatedRoom: Room = gson.fromJson(roomInfo.toString(), Room::class.java)
-        Log.d(TAG, "Room Details: $updatedRoom")
 
             _roomState.value = UiState.Success(updatedRoom)
 
             val currentUser = updatedRoom?.players?.find { it.id == socketManager.getSocketId() }
+
             _isPartyLeader.value = currentUser?.isPartyLeader ?: false
 
         Log.d(TAG, "_room StateFlow Value: ${_roomState.value}")
@@ -101,9 +118,19 @@ class LobbyViewModel @Inject constructor(private val socketManager: SocketManage
 
     private fun handleRoomError(errorMessage: String) {
         viewModelScope.launch {
-            _roomState.value = UiState.Error(errorMessage)  // Set the error state with the error message
+            _roomState.value = UiState.Error(errorMessage)
         }
     }
+
+    fun startGame() {
+        val roomState = _roomState.value
+        if (roomState is UiState.Success && roomState.data != null) {
+            socketManager.emit("startGame",roomState.data.name)
+        }
+    }
+
+
+
 
     fun disconnectSocket() {
         socketManager.disconnect()

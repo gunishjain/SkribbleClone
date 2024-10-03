@@ -9,4 +9,8 @@ sealed class Screen(val route: String) {
         fun passRoomName(roomName: String): String = "lobby/$roomName"
     }
 
+    object Game : Screen("game/{roomName}") {
+        fun passRoomName(roomName: String) = "game/$roomName"
+    }
+
 }

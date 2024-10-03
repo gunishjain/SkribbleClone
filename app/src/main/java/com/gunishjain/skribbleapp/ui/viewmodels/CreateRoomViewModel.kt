@@ -32,7 +32,7 @@ class CreateRoomViewModel @Inject constructor(private val socketManager: SocketM
         socketManager.on("roomCreated") { args ->
             if (args.isNotEmpty()) {
                 val roomInfo = args[0] as JSONObject
-                Log.d("CRVM",roomInfo.toString())
+//                Log.d("CRVM",roomInfo.toString())
                 handleRoomCreation(roomInfo)
             }
         }

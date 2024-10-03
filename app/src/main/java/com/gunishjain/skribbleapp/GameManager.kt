@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 object GameManager {
 
+    private const val ROUND_TIME = 60
     private val _gameState = MutableStateFlow(
         GameState(
             currentPhase = GamePhase.LOBBY,
@@ -37,6 +38,31 @@ object GameManager {
                 players = room.players
             )
         )
+    }
+
+    fun startGame() {
+        val currentState = _gameState.value
+        if (currentState.players.size < 2) return
+
+        val newState = currentState.copy(
+            currentPhase = GamePhase.WORD_SELECTION,
+            currentRound = 1,
+            currentDrawer = currentState.players.first()
+        )
+        updateGameState(newState)
+    }
+
+    fun selectWord(word: String) {
+        val currentState = _gameState.value
+        if (currentState.currentPhase != GamePhase.WORD_SELECTION) return
+
+        val newState = currentState.copy(
+            currentPhase = GamePhase.DRAWING,
+            currentWord = word,
+            timeRemaining = ROUND_TIME
+        )
+        updateGameState(newState)
+//        startTimer()
     }
 
 
